@@ -28,3 +28,15 @@ Return the best matching person
 ↓
 FastAPI Response
 Return JSON
+
+
+Technologies:
+| Purpose          | Library      |
+| ---------------- | ------------ |
+| API              | FastAPI      |
+| OCR              | EasyOCR      |
+| Image Processing | OpenCV       |
+| Matching         | RapidFuzz    |
+| Database         | CSV + Pandas |
+| Validation       | Pydantic     |
+
