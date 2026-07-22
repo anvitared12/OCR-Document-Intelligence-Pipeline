@@ -7,4 +7,7 @@
     e. pip install python-multipart
     f. pip install pydantic
 3. Running command : uvicorn app:app --reload
-4. First Step code for ocr.py -> Recieve image and return text
+4. First Step code for ocr.py -> 
+    a. Recieve image and return text
+    b. pip install pytesseract, pip install pdf2image
+5. 
