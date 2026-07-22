@@ -10,4 +10,5 @@
 4. First Step code for ocr.py -> 
     a. Recieve image and return text
     b. pip install pytesseract, pip install pdf2image
-5. 
+5. Adding extractor matcher normalizer database
+6. Faced issue in installation of pytesseract

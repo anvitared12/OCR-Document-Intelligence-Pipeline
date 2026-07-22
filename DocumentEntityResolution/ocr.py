@@ -1,12 +1,19 @@
 import sys
 import json
+import os
 from pathlib import Path
-
+ 
 from PIL import Image
 import numpy as np
 import cv2
 import pytesseract
 from pdf2image import convert_from_path
+
+
+if os.environ.get("TESSERACT_CMD"):
+    pytesseract.pytesseract.tesseract_cmd = os.environ["TESSERACT_CMD"]
+ 
+POPPLER_PATH = os.environ.get("POPPLER_PATH")  # None is fine if on PATH
 
 PDF_EXTENSIONS = {".pdf"}
 
