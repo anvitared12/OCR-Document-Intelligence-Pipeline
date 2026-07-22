@@ -1,168 +1,62 @@
-# 📄 Smart Document Entity Resolution System
+# OCR Document Intelligence Pipeline
 
-An OCR-powered Document Intelligence pipeline that extracts structured information from scanned documents, normalizes noisy text, performs fuzzy entity matching against a reference database, and returns confidence-scored matches through REST APIs.
+Upload a scanned document (image or PDF) and get back the matching person record from a database, with a confidence score — using OCR, entity extraction, text normalization, and fuzzy string matching. No ML models required.
 
-This project demonstrates how modern AI systems process messy real-world documents containing inconsistent names, addresses, OCR errors, and incomplete information.
-
----
-
-## 🚀 Features
-
-- 📄 Upload scanned documents or images
-- 🔍 OCR-based text extraction using EasyOCR
-- 📝 Automatic extraction of:
-  - Name
-  - Address
-  - Phone Number
-  - Email
-- 🧹 Text normalization to handle inconsistent formatting
-- 🤝 Entity Resolution using fuzzy string matching
-- 📊 Confidence score for each matched record
-- ⚡ FastAPI REST APIs
-- 📂 CSV-based reference database
-- 📈 Modular architecture for easy extension
-
----
-
-# 🏗️ System Architecture
+## Pipeline
 
 ```
-               Upload Document
-                      │
-                      ▼
-               Image Preprocessing
-                 (OpenCV)
-                      │
-                      ▼
-               OCR Extraction
-                 (EasyOCR)
-                      │
-                      ▼
-             Raw Extracted Text
-                      │
-                      ▼
-            Entity Extraction Module
-        (Regex + Rule-based Processing)
-                      │
-                      ▼
-           Text Normalization Module
-                      │
-                      ▼
-          Entity Resolution Engine
-             (RapidFuzz Matching)
-                      │
-                      ▼
-           Confidence Score Engine
-                      │
-                      ▼
-             FastAPI JSON Response
+Upload → OCR → Entity Extraction → Normalization → Fuzzy Matching → JSON result
 ```
 
----
+| Stage | File | Job |
+|---|---|---|
+| OCR | `ocr.py` | Image/PDF → raw text (Tesseract, with adaptive thresholding for photographed/uneven-lit documents) |
+| Extraction | `extractor.py` | Raw text → `{name, address, phone, email}` via regex + heuristics |
+| Normalization | `normalizer.py` | Lowercase, strip punctuation, collapse whitespace, expand abbreviations (`Rd`→`Road`, `Bengaluru`→`Bangalore`, etc.) |
+| Matching | `matcher.py` | Compare extracted entities against `database.csv` using RapidFuzz; returns best match + confidence |
+| API | `app.py` | FastAPI server tying it all together |
 
-# 📁 Project Structure
-
-```
-Smart-Document-Entity-Resolution/
-│
-├── app.py
-├── ocr.py
-├── extractor.py
-├── matcher.py
-├── normalizer.py
-├── database.csv
-├── requirements.txt
-├── README.md
-│
-├── sample_documents/
-│   ├── sample1.png
-│   ├── sample2.jpg
-│   └── sample3.pdf
-│
-└── static/
-```
-
----
-
-# 🛠️ Tech Stack
-
-## Languages
-
-- Python
-
-## Backend
-
-- FastAPI
-- Uvicorn
-
-## OCR
-
-- EasyOCR
-
-## Image Processing
-
-- OpenCV
-
-## Entity Matching
-
-- RapidFuzz
-
-## Data Processing
-
-- Pandas
-
-## Validation
-
-- Pydantic
-
----
-Installation of tesseract
-https://github.com/UB-Mannheim/tesseract/wiki
-
-Installation of poppler
-https://github.com/oschwartz10612/poppler-windows/releases
-
-# ▶️ Run the Application
+## Setup
 
 ```bash
-uvicorn app:app --reload
+pip install -r requirements.txt
 ```
 
-Open
+Also required (not installable via pip):
+- **Tesseract OCR** — [Windows installer](https://github.com/UB-Mannheim/tesseract/wiki)
+- **Poppler** — [Windows build](https://github.com/oschwartz10612/poppler-windows/releases) (needed for PDF support)
 
+Set these environment variables (Windows example):
+```powershell
+setx TESSERACT_CMD "C:\Program Files\Tesseract-OCR\tesseract.exe"
+setx POPPLER_PATH "C:\path\to\poppler\Library\bin"
 ```
-http://127.0.0.1:8000/docs
-```
+(Restart your terminal after running `setx`.)
 
-to access the interactive Swagger UI.
+## Run
 
----
-
-# 📥 API Endpoint
-
-## POST
-
-```
-/match-document
-```
-
-### Input
-
-Upload
-
-- Image (.jpg, .png)
-- PDF
-
----
-
-### Sample Request
-
-```
-Document
-
-↓
-
-sample_form.jpg
+```bash
+python -m uvicorn app:app --reload
 ```
 
----
+Open `http://127.0.0.1:8000/docs` for interactive Swagger docs.
+
+## API
+
+**POST** `/match-document`
+
+Upload a document image/PDF. Returns:
+```json
+{
+  "matched_person": "John Smith",
+  "confidence": 95.4
+}
+```
+
+Add `?debug=true` to also see the raw OCR text and extracted/normalized entities.
+
+## Notes
+
+- Confidence is the average of name, address, and phone similarity scores (0–100). Email is extracted but not scored.
+- A confidence below ~50% returns `matched_person: null` (no match found) instead of a false positive.
+- `database.csv` contains ~50 sample records for testing.
