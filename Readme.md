@@ -40,3 +40,9 @@ Technologies:
 | Database         | CSV + Pandas |
 | Validation       | Pydantic     |
 
+
+Installation of tesseract
+https://github.com/UB-Mannheim/tesseract/wiki
+
+Installation of poppler
+https://github.com/oschwartz10612/poppler-windows/releases
