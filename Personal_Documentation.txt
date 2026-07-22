@@ -11,4 +11,7 @@
     a. Recieve image and return text
     b. pip install pytesseract, pip install pdf2image
 5. Adding extractor matcher normalizer database
-6. Faced issue in installation of pytesseract
+6. Faced issue in installation of pytesseract and other imports
+    issue facing - even though the module is downloaded showing no mudule found.
+    Issue Solved - The system has two python version the modules were installed in different version python and uvicorn was running in a different python version. To solve this run the command - "python -m uvicorn app:app --reload" instead of uvicorn app:app --reload , this This forces it to run inside whichever Python the python command resolves to (3.11, where your packages actually are) instead of whatever separate uvicorn.exe happens to be first on your PATH.
+7. Faced issue while testing - poppler was not loaded properly in code. convert_from_path(str(path), dpi=300) was missing

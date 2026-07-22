@@ -4,7 +4,7 @@ import json
 import re
 
 from rapidfuzz import fuzz
-from normalize import normalize_text
+from normalizer import normalize_text
 
 DEFAULT_DB_PATH = "database.csv"
 MATCH_THRESHOLD = 50  
